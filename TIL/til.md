@@ -1,5 +1,9 @@
 ## 01.06.2021
  - Learned some things in markdown lang
- - damn, I should have just forked the repository from someone 
- - information security teachers at the university cause rejection to study information security at the university 
- - how to create new branch, delete current, rename branch and how to change default branch
+ - damn, I should have just forked the repository from someone
+ - information security teachers at the university cause rejection to study information security at the university
+## 02.06.2021
+ - first steps in flask
+ - more about ci/cd
+ - quick overview on devops tools
+ - a little about port-security
