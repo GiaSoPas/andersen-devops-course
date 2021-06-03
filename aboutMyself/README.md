@@ -1,1 +1,1 @@
-in "aboutme.md" file u can read about me
+Here you can find out a little more (about me)[https://github.com/nastasyafedotovna/andersen-devops-course/blob/main/aboutMyself/aboutme.md]
