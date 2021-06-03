@@ -1,5 +1,7 @@
 # What is this repository about? 
-This repository contains Andersen devops course materials and TIL-blog.
+*This repository is dedicated to Andersen's DevOps course.
+Course duration: 31.05 - 21.07*
+
 # Task table
 | Task  | Deadline |Status|
 | ------------- | ------------- |---------|
