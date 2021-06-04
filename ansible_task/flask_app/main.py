@@ -1,5 +1,55 @@
 from flask import Flask, request
+from string import Template
+
+
+HTML_TEMPLATE = Template("""
+<!DOCTYPE html>
+<head>
+   <title>Ansible task</title>
+   <style>
+      body{
+          text-align: center;
+          background-color: #FFAAAA;
+      }
+
+      iframe{
+          width: 80%;
+          height: 600px;
+          -webkit-animation: fun-function 2.5s linear infinite;
+          -webkit-animation-direction: alternate;
+          -moz-animation: fun-function 2.5s linear infinite;
+          -moz-animation-direction: alternate;
+      }
+
+      @-webkit-keyframes fun-function{
+        from{
+          -webkit-transform: rotate(0deg) skew(-30deg);
+        }
+        to{
+          -webkit-transform: rotate(360deg) skew(30deg);
+        }
+      }
+
+      @-moz-keyframes fun-function{
+        from{
+          -moz-transform: rotate(0deg) skew(-30deg);
+        }
+        to{
+          -moz-transform: rotate(360deg) skew(30deg);
+        }
+      }
+   </style>
+</head>
+<body>
+    <h2>${headline}</h2>
+    <iframe src="https://www.youtube.com/embed/${youtube_id}?autoplay=1" frameborder="0" allowfullscreen></iframe>
+</body>""")
+
+
 app = Flask(__name__)
+
+
+
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -24,16 +74,20 @@ def main():
             if 'count' in request_data:
                 count = request_data['count']
 
-            if count is not None:
+            if type(count) == type(5):
                 out = '{} says {}\n'.format(animal, sound)*count + \
                 'Made with ❤️  by {}\n'.format('Gizar Zigangirov')
             else:
                 out = '{} says {}\n'.format(animal, sound) + \
                 'Made with ❤️  by {}\n'.format('Gizar Zigangirov')
 
+        else:
+            out = 'If you stare into the abyss, the abyss stares back at you'
+
         return out
-    else:
-        pass
+
+    head = """ Ansible task by Gizar Zigangirov"""
+    return HTML_TEMPLATE.substitute(headline=head, youtube_id='rRPQs_kM_nw')
 
 if __name__=="__main__":
-    app.run(port=5000)
+    app.run(host = '0.0.0.0', port=80, use_reloader=True)
