@@ -11,3 +11,8 @@
  - amazing [playlist](https://open.spotify.com/playlist/37i9dQZF1DX5trt9i14X7j?si=utsRtzczRHyy-fe3Npbn7w) on Spotify!
  - beautiful README is important
  - trick to clear all history of commits:)
+## 04.06.2021
+ - first steps in ansible playbooks
+ - how to create rules in iptables
+## 05.06.2021
+ - how to create own services in systemd
