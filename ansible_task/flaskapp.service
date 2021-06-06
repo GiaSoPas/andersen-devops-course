@@ -1,11 +1,11 @@
 [Unit]
 Description=Ansible task
-After=network-manager.service
+After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/var/www/ansbile_task/
-ExecStart=/usr/bin/python3 /var/www/ansible_task/main.py
+WorkingDirectory=/home/vagrant/
+ExecStart=/usr/bin/python3 /home/vagrant/main.py
 
 [Install]
 WantedBy=multi-user.target

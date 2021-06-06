@@ -3,15 +3,10 @@
   gather_facts: no
   become: yes
   tasks:
-  - name: creating /var/www/ansible_task dir
-    file:
-      path: /var/www/ansible_task
-      state: directory
-
   - name: copy flask app to flask_servers
     copy:
       src: /$PWD/flask_app/main.py
-      dest: /var/www/ansible_task/main.py
+      dest: /home/vagrant/main.py
 
   - name: update apt-get repo and cache
     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
@@ -37,11 +32,6 @@
       state: latest
 
 
-  - name: Disable root login over ssh
-    lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin" line="PermitRootLogin no" state=present
-    notify:
-        - Restart sshd
-
   - name: copy flask service
     copy:
       src: /$PWD/flaskapp.service
@@ -52,3 +42,35 @@
 
   - name: start flaskapp service
     service: name=flaskapp.service state=started
+
+
+  - name: Disable root login over ssh
+    lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin yes" line="PermitRootLogin no" state=present
+    notify:
+      - Restart sshd
+
+  - name: Allow pubkey auth
+    lineinfile: dest=/etc/ssh/sshd_config regexp="^(.\w*)PubkeyAuthentication " line="PubkeyAuthentication yes" state=present
+    notify:
+      - Restart sshd
+
+
+  - name: Disable password auth
+    lineinfile: dest=/etc/ssh/sshd_config regexp="^(\w*[^Pubkey])Authentication yes" line="^(\w*[^Pubkey])Authentication no" state=present
+    notify:
+      - Restart sshd
+
+#  - name: Disable kerberos auth
+#    lineinfile: dest=/etc/ssh/sshd_config regexp="^#KerberosAuthentication" line="KerberosAuthentication no" state=present
+
+
+#  - name: Allow pubkey auth
+#    lineinfile: dest=/etc/ssh/sshd_config regexp="^(.\w*)PubkeyAuthentication" line="PubkeyAuthentication yes" state=present
+#    notify:
+#        - Restart sshd
+
+  handlers:
+    - name: Restart sshd
+      service:
+        name: sshd
+        state: restarted
