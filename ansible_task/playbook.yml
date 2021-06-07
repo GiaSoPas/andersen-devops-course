@@ -1,8 +1,27 @@
 ---
 - hosts: flask_servers
-  gather_facts: no
+  gather_facts: false
   become: yes
   tasks:
+  - name: create a directory for keys
+    file:
+      path: /home/loserd0m/key_dir
+      state: directory
+    delegate_to: localhost
+
+
+  - name: generate an OpenSSH keypair
+    openssh_keypair:
+      path: /home/loserd0m/key_dir/id_ssh_ecdsa
+      type: ecdsa
+    delegate_to: localhost
+
+  - authorized_key:
+      user: vagrant
+      state: present
+      key: "{{ lookup('file', '/$PWD/key_dir/id_ssh_ecdsa.pub') }}"
+
+
   - name: copy flask app to flask_servers
     copy:
       src: /$PWD/flask_app/main.py
@@ -10,11 +29,6 @@
 
   - name: update apt-get repo and cache
     apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-
-  #- name: installing py3
-  #  apt:
-  #    name: python3
-  #    update_cache: yes
 
   - name: installing py3 pip3 setuptools
     apt:
@@ -31,7 +45,6 @@
       name: flask
       state: latest
 
-
   - name: copy flask service
     copy:
       src: /$PWD/flaskapp.service
@@ -45,32 +58,51 @@
 
 
   - name: Disable root login over ssh
-    lineinfile: dest=/etc/ssh/sshd_config regexp="^PermitRootLogin yes" line="PermitRootLogin no" state=present
-    notify:
-      - Restart sshd
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "^PermitRootLogin yes"
+      line: "PermitRootLogin no"
+      state: present
+    notify: restart sshd
+
 
   - name: Allow pubkey auth
-    lineinfile: dest=/etc/ssh/sshd_config regexp="^(.\w*)PubkeyAuthentication " line="PubkeyAuthentication yes" state=present
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "^#?PubkeyAuthentication"
+      line: "PubkeyAuthentication yes"
+      state: present
     notify:
-      - Restart sshd
+      - restart sshd
 
-
-  - name: Disable password auth
-    lineinfile: dest=/etc/ssh/sshd_config regexp="^(\w*[^Pubkey])Authentication yes" line="^(\w*[^Pubkey])Authentication no" state=present
+  - name: Disallow password auth
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "^#?PasswordAuthentication"
+      line: "PasswordAuthentication no"
+      state: present
     notify:
-      - Restart sshd
+      - restart sshd
 
-#  - name: Disable kerberos auth
-#    lineinfile: dest=/etc/ssh/sshd_config regexp="^#KerberosAuthentication" line="KerberosAuthentication no" state=present
+  - name: Disallow kerberos auth
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "^#?KerberosAuthentication"
+      line: "KerberosAuthentication no"
+      state: present
+    notify:
+      - restart sshd
 
+  - name: Disallow challenge response auth
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "^#?ChallengeResponseAuthentication"
+      line: "ChallengeResponseAuthentication no"
+      state: present
+    notify:
+      - restart sshd
 
-#  - name: Allow pubkey auth
-#    lineinfile: dest=/etc/ssh/sshd_config regexp="^(.\w*)PubkeyAuthentication" line="PubkeyAuthentication yes" state=present
-#    notify:
-#        - Restart sshd
 
   handlers:
-    - name: Restart sshd
-      service:
-        name: sshd
-        state: restarted
+    - name: restart sshd
+      service: name=sshd state=restarted
