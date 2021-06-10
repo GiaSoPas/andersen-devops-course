@@ -1,4 +1,5 @@
 from flask import Flask, request
+import emoji
 from string import Template
 
 
@@ -62,11 +63,10 @@ def main():
 
         if request_data:
             if 'animal' in request_data:
-                animal = request_data['animal']
-                if animal == 'cow':
-                    animal = '🐮'
-                if animal == 'elephant':
-                    animal = '🐘'
+                try:
+                    animal = emoji.emojize(":"+request_data['animal']+":")
+                except:
+                    animal = request_data['animal']
 
             if 'sound' in request_data:
                 sound = request_data['sound']
@@ -76,17 +76,18 @@ def main():
 
             if type(count) == type(5):
                 out = '{} says {}\n'.format(animal, sound)*count + \
-                'Made with ❤️  by {}\n'.format('Gizar Zigangirov')
+                emoji.emojize('Made with :heart: by Gizar Zigangirov\n')
             else:
                 out = '{} says {}\n'.format(animal, sound) + \
-                'Made with ❤️  by {}\n'.format('Gizar Zigangirov')
+                emoji.emojize('Made with :heart: by Gizar Zigangirov\n')
 
         else:
-            out = 'If you stare into the abyss, the abyss stares back at you'
+
+            out = 'Invalid json:(\nIf you stare into the abyss, the abyss stares back at you'
 
         return out
 
-    head = """ Ansible task by Gizar Zigangirov"""
+    head = """Ansible task by Gizar Zigangirov"""
     return HTML_TEMPLATE.substitute(headline=head, youtube_id='rRPQs_kM_nw')
 
 if __name__=="__main__":
