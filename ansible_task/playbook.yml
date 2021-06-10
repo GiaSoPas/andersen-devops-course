@@ -3,23 +3,20 @@
   gather_facts: false
   become: yes
   tasks:
-  - name: create a directory for keys
-    file:
-      path: /home/loserd0m/key_dir
-      state: directory
-    delegate_to: localhost
-
-
-  - name: generate an OpenSSH keypair
-    openssh_keypair:
-      path: /home/loserd0m/key_dir/id_ssh_ecdsa
-      type: ecdsa
-    delegate_to: localhost
+  - name: Added new user for flask app with ssh-keys
+    user:
+      name: flaskapp
+      group: www-data
+      groups: www-data, ssh
+      generate_ssh_key: yes
+      ssh_key_bits: 4096
+      ssh_key_file: .ssh/id_rsa
+      state: absent
 
   - authorized_key:
-      user: vagrant
+      user: flaskapp
       state: present
-      key: "{{ lookup('file', '/$PWD/key_dir/id_ssh_ecdsa.pub') }}"
+      key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
 
 
   - name: copy flask app to flask_servers
