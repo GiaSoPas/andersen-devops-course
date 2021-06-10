@@ -16,3 +16,6 @@
  - how to create rules in iptables
 ## 05.06.2021
  - how to create own services in systemd
+## 06.06.2021
+ - a little more about ssh
+ - how to generate ssh keys in playbook
