@@ -1,0 +1,7 @@
+[flask_servers]
+192.168.33.10
+
+[flask_servers:vars]
+ansible_connection=ssh
+ansible_user=vagrant
+ansible_ssh_pass=vagrant
