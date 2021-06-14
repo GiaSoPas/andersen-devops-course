@@ -7,16 +7,16 @@ sudo netstat -tunapl | awk '/firefox/ {print $5}' | cut -d: -f1 | sort | uniq -c
 
 ## What this one-line does.
 
-1. `netstat` - is a command-line utility for working with the network, for displaying various network parameters depending on the specified options.
-   `-t` or `--tcp` - show tcp ports
-   `-u` or `--udp` - show udp ports
-   `-n` Show network addresses as numbers. Show ports as number, not letters. (443 - https, etc.)
-   `-a` Shows the status of all sockets; normally, sockets used by server processes are not shown.
-   `-p` Display the PID/Name of the process that created the socket.
-   `-l` or `--listening` - view only the listening ports.
-2. `awk '/firefox/ {print $5}'`in the output of the netstat command, we look for lines containing `firefox` and output the fifth column (ip+port)
-3. `cut -d: -f1` we cut the ports, leaving only IP
-4. `sort` sort (by the first character in the string)
+1. `netstat` - is a command-line utility for working with the network, for displaying various network parameters depending on the specified options.  
+   `-t` or `--tcp` - show tcp ports  
+   `-u` or `--udp` - show udp ports  
+   `-n` Show network addresses as numbers. Show ports as number, not letters. (443 - https, etc.)  
+   `-a` Shows the status of all sockets; normally, sockets used by server processes are not shown.  
+   `-p` Display the PID/Name of the process that created the socket.  
+   `-l` or `--listening` - view only the listening ports.  
+2. `awk '/firefox/ {print $5}'`in the output of the netstat command, we look for lines containing `firefox` and output the fifth column (ip+port)  
+3. `cut -d: -f1` we cut the ports, leaving only IP  
+4. `sort` sort (by the first character in the string)  
 5. `uniq -c` looking for repeats of IP addresses and output the number of these repeats
 6. `sort` sort again
 7. `tail -n5` show last five IP addresses
