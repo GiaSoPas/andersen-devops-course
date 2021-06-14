@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# Output to stderr
+
+err() { cat <<< "$@" 1>&2; }
+
+read -p "Enter tool (netstat or ss): " TOOL
+
+read -p "Enter process name/PID: " PROCESS
+
+read -p "Enter connection state: " STATE
+
+read -p "Enter number of lines: " NUMLINES
+
+read -p "Enter field: " FIELD
+
+
+
+# Check environment
+if [ -z "$(which netstat)" ]; then
+  err "Please install net-tools package."
+  exit 1
+fi
+
+if [ -z "$(which netstat)" ]; then
+  err "Please install iproute2 package."
+  exit 1
+fi
+
+if [ -z "$(which whois)" ]; then
+  err "Please install whois package."
+  exit 1
+fi
+
+if [ "$EUID" -ne 0 ]; then
+  echo "Run as root to see more details"
+fi
+
+
+# Check parameters
+
+if [ -z "$PROCESS" ]; then
+    err "Invalid proccess"
+    exit 1
+fi
+
+
+if [ ! -z "$STATE" ]; then
+  STATE=$(echo "$STATE" | tr a-z A-Z)
+else
+  err "Invalid state"
+  exit 1
+fi
+
+re='^[0-9]+$'
+if [[  ! "$NUMLINES" =~ $re ]]; then
+  err "numer of lines shoud be natural number"
+  exit 1
+fi
+
+
+# Fetch data
+if [ $TOOL = "netstat" ]; then
+  REMOTES="$(netstat -tunapl |
+  	awk '$6~/^[^0-9]/ && $5~/^[1-9]/ {
+  		print $5, $6, $7}' |
+  	column -t)"
+  REMOTES=$(echo "$REMOTES" | grep "$PROCESS")
+  REMOTES=$(echo "$REMOTES" | grep "$STATE")
+fi
+
+if [ $TOOL = "ss" ]; then
+  RAW=`ss -tunap`
+  FILTERED=$(echo "$RAW" | awk '/'${PROCESS}'/ {print $6}')
+  TRIMMED=$(echo "$FILTERED" | cut -d: -f1)
+  CLEAN=$(echo "$TRIMMED" | sort | uniq -c | sort )
+  REMOTES=$(echo "$CLEAN" | tail -n "$NUMLINES" )
+fi
+
+
+if [ -z  "$REMOTES" ];then
+  exit;
+fi
+
+echo "CONNECTIONS:"
+echo "$REMOTES"
+
+IPS=$(echo "$REMOTES" | cut -d: -f1 | sort | uniq -c | sort)
+IPS=$(echo "$IPS" | tail -n "$NUMLINES" | grep -oP '(\d+\.){3}\d+')
+
+echo $'\nWHOIS:'
+for ip in $IPS
+do
+  if [ "$FIELD"="organization" ]
+  then
+    echo $ip $'\t' $(whois $ip | awk -F':' '/^OrgName|^org-name|^role|^person/ {print $2}' | tr -s ' ' | uniq)
+  else
+    echo $ip $'\t' $(whois $ip | grep -i "^$FIELD" | uniq)
+  fi
+done
