@@ -19,3 +19,11 @@
 ## 06.06.2021
  - a little more about ssh
  - how to generate ssh keys in playbook
+## 07.06.2021
+ - bash history
+ - alternatives for ansible (chef, puppet, salt)
+## 09.06.2021
+ - a lot of IDE's
+ - SSL
+## 12.06.2021
+ - working with ss
