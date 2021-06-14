@@ -61,20 +61,15 @@ fi
 
 # Fetch data
 if [ $TOOL = "netstat" ]; then
-  REMOTES="$(netstat -tunapl |
-  	awk '$6~/^[^0-9]/ && $5~/^[1-9]/ {
-  		print $5, $6, $7}' |
-  	column -t)"
-  REMOTES=$(echo "$REMOTES" | grep "$PROCESS")
-  REMOTES=$(echo "$REMOTES" | grep "$STATE")
+  REMOTES=$(netstat -tunapl | awk '/'${PROCESS}'/ {print $5, $6, $7}')
+  REMOTES=$(echo "$REMOTES" | grep "$STATE" | sort | uniq -c | sort)
+  REMOTES=$(echo "$REMOTES" | tail -n "$NUMLINES" | column -t)
 fi
 
 if [ $TOOL = "ss" ]; then
-  RAW=`ss -tunap`
-  FILTERED=$(echo "$RAW" | awk '/'${PROCESS}'/ {print $6}')
-  TRIMMED=$(echo "$FILTERED" | cut -d: -f1)
-  CLEAN=$(echo "$TRIMMED" | sort | uniq -c | sort )
-  REMOTES=$(echo "$CLEAN" | tail -n "$NUMLINES" )
+  REMOTES=$(ss -tunap | awk '/'${PROCESS}'/ {print $6, $2, $7}')
+  REMOTES=$(echo "$REMOTES" | grep "$STATE" | sort | uniq -c | sort)
+  REMOTES=$(echo "$REMOTES" | tail -n "$NUMLINES" | column -t)
 fi
 
 
