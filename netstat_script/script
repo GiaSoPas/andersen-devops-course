@@ -4,14 +4,16 @@
 
 err() { cat <<< "$@" 1>&2; }
 
+if [ "$EUID" -ne 0 ]; then
+  echo "Run as root to see more details"
+fi
+
+
+#Read parameters
 read -p "Enter tool (netstat or ss): " TOOL
-
 read -p "Enter process name/PID: " PROCESS
-
 read -p "Enter connection state: " STATE
-
 read -p "Enter number of lines: " NUMLINES
-
 read -p "Enter field: " FIELD
 
 
@@ -32,13 +34,8 @@ if [ -z "$(which whois)" ]; then
   exit 1
 fi
 
-if [ "$EUID" -ne 0 ]; then
-  echo "Run as root to see more details"
-fi
-
 
 # Check parameters
-
 if [ -z "$PROCESS" ]; then
     err "Invalid proccess"
     exit 1
@@ -54,7 +51,7 @@ fi
 
 re='^[0-9]+$'
 if [[  ! "$NUMLINES" =~ $re ]]; then
-  err "numer of lines shoud be natural number"
+  err "number of lines should be natural number"
   exit 1
 fi
 
@@ -86,10 +83,10 @@ IPS=$(echo "$IPS" | tail -n "$NUMLINES" | grep -oP '(\d+\.){3}\d+')
 echo $'\nWHOIS:'
 for ip in $IPS
 do
-  if [ "$FIELD"="organization" ]
+  if [ "$FIELD"!="organization" ]
   then
-    echo $ip $'\t' $(whois $ip | awk -F':' '/^OrgName|^org-name|^role|^person/ {print $2}' | tr -s ' ' | uniq)
+    echo $ip $'\t' $(whois $ip | grep -i "^$FIELD" | uniq | tr -s ' ' | awk -F':' '{print $2}')
   else
-    echo $ip $'\t' $(whois $ip | grep -i "^$FIELD" | uniq)
+    echo $ip $'\t' $(whois $ip | awk -F':' '/^OrgName|^org-name|^role|^person/ {print $2}' | tr -s ' ' | uniq)
   fi
 done
