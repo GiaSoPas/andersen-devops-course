@@ -2,21 +2,10 @@
 
 # Output to stderr
 
-err() { cat <<< "$@" 1>&2; }
-
-if [ "$EUID" -ne 0 ]; then
-  echo "Run as root to see more details"
-fi
-
-
-#Read parameters
-read -p "Enter tool (netstat or ss): " TOOL
-read -p "Enter process name/PID: " PROCESS
-read -p "Enter connection state: " STATE
-read -p "Enter number of lines: " NUMLINES
-read -p "Enter field: " FIELD
-
-
+# $@ - all parameters
+# cat <<< <something> - redirect to cat
+# 2>&1
+err() { cat <<< "$@" 2>&1; }
 
 # Check environment
 if [ -z "$(which netstat)" ]; then
@@ -24,7 +13,7 @@ if [ -z "$(which netstat)" ]; then
   exit 1
 fi
 
-if [ -z "$(which netstat)" ]; then
+if [ -z "$(which ss)" ]; then
   err "Please install iproute2 package."
   exit 1
 fi
@@ -35,25 +24,49 @@ if [ -z "$(which whois)" ]; then
 fi
 
 
-# Check parameters
+#Warning for non-root
+if [ "$EUID" -ne 0 ]; then
+  echo "Run as root to see more details"
+fi
+
+
+#Read parameters
+read -p "Enter tool (netstat or ss): " TOOL
+if [ -z "$TOOL" ]; then
+    err "Enter tool!"
+    exit 1
+fi
+read -p "Enter process name/PID: " PROCESS
 if [ -z "$PROCESS" ]; then
-    err "Invalid proccess"
+    err "Enter process!"
     exit 1
 fi
 
-
+read -p "Enter connection state: " STATE
 if [ ! -z "$STATE" ]; then
   STATE=$(echo "$STATE" | tr a-z A-Z)
 else
-  err "Invalid state"
+  err "Enter state!"
   exit 1
 fi
 
+read -p "Enter number of lines: " NUMLINES
 re='^[0-9]+$'
 if [[  ! "$NUMLINES" =~ $re ]]; then
   err "number of lines should be natural number"
   exit 1
 fi
+
+read -p "Enter field: " FIELD
+if [ -z "$FIELD" ]; then
+    err "Enter field!"
+    exit 1
+fi
+
+
+
+
+
 
 
 # Fetch data
@@ -83,9 +96,9 @@ IPS=$(echo "$IPS" | tail -n "$NUMLINES" | grep -oP '(\d+\.){3}\d+')
 echo $'\nWHOIS:'
 for ip in $IPS
 do
-  if [ "$FIELD"!="organization" ]
+  if [ "$FIELD"!="Organization" ]
   then
-    echo $ip $'\t' $(whois $ip | grep -i "^$FIELD" | uniq | tr -s ' ' | awk -F':' '{print $2}')
+    echo $ip $'\t' $(whois $ip | grep -i "^$FIELD" | uniq | tr -s ' ' | awk -F': ' '{print $2}')
   else
     echo $ip $'\t' $(whois $ip | awk -F':' '/^OrgName|^org-name|^role|^person/ {print $2}' | tr -s ' ' | uniq)
   fi
