@@ -5,8 +5,9 @@
 
     vars:
       username: vagrant
+      rule_file: rule_flaskapp
       #path to app
-      app_path   : /home/"{{ username }}"/
+      app_path   : /home/vagrant/
       #path to service
       service_path  : /etc/systemd/system/
       #necessary packages to install
@@ -20,9 +21,8 @@
         - ufw
 
       #app file
-      app_files:
-        - flask_app.py
-        - create_ssl
+      app_file: flask_app.py
+      #myscript: create_ssl
       #service file
       service_file: flask_app.service
 
@@ -73,9 +73,15 @@
 
       - name: copy necessary files
         copy:
-          src : "{{ app_files }}"
+          src : "{{ app_file }}"
           dest: "{{ app_path }}"
           mode: '0775'
+
+      #- name: copy necessary files
+      #  copy:
+      #    src : "{{ myscript }}"
+      #    dest: "{{ app_path }}"
+      #    mode: '0775'
 
       - name: create ssl
         script: create_ssl "{{ username }}"
@@ -88,6 +94,20 @@
       #- name  : create ssl-keys
       #  script: create_ssl
 
+      - name: enable ufw
+        ufw:
+          state: enabled
+
+
+      - name: 15a-Copy file rule for flask
+        copy:
+          src: "{{ rule_file }}"
+          dest: /etc/ufw/applications.d
+          owner: root
+          group: root
+          mode: '0644'
+        notify:
+          - restart ufw
 
       - name: rules for ufw
         ufw:
@@ -96,8 +116,11 @@
         loop:
           - "WWW Full"
           - "OpenSSH"
+          - "flask_app"
         notify:
           - restart ufw
+
+
 
       - name: copy sshd file
         copy:

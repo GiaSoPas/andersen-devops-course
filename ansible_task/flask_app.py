@@ -92,4 +92,4 @@ def main():
     return HTML_TEMPLATE.substitute(headline=head, youtube_id='rRPQs_kM_nw')
 
 if __name__=="__main__":
-    app.run(host = '0.0.0.0',port='80', ssl_context=('selfsigned.cert', 'selfsigned.key'))
+    app.run(host = '0.0.0.0',port='80', ssl_context=('selfsigned.crt', 'selfsigned.key'))
