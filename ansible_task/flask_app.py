@@ -1,5 +1,6 @@
 from flask import Flask, request
 import emoji
+import os
 from string import Template
 
 
@@ -83,7 +84,7 @@ def main():
 
         else:
 
-            out = 'Invalid json:(\nIf you stare into the abyss, the abyss stares back at you'
+            out = 'If you stare into the abyss, the abyss stares back at you'
 
         return out
 
@@ -91,4 +92,4 @@ def main():
     return HTML_TEMPLATE.substitute(headline=head, youtube_id='rRPQs_kM_nw')
 
 if __name__=="__main__":
-    app.run(host = '0.0.0.0', port=80)
+    app.run(host = '0.0.0.0',port='80', ssl_context=('selfsigned.cert', 'selfsigned.key'))

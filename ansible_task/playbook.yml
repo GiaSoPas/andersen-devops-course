@@ -1,105 +1,124 @@
 ---
-- hosts: flask_servers
-  gather_facts: false
-  become: yes
-  tasks:
-  - name: Added new user for flask app with ssh-keys
-    user:
-      name: flaskapp
-      group: www-data
-      groups: www-data, ssh
-      generate_ssh_key: yes
-      ssh_key_bits: 4096
-      ssh_key_file: .ssh/id_rsa
-      state: absent
+  - name       : Deploy flask app to vm
+    hosts      : vmflask
+    become     : yes
 
-  - authorized_key:
-      user: flaskapp
-      state: present
-      key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
-
-
-  - name: copy flask app to flask_servers
-    copy:
-      src: /$PWD/flask_app/main.py
-      dest: /home/vagrant/main.py
-
-  - name: update
-    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
-
-  - name: installing py3 pip3 setuptools
-    apt:
-      name:
+    vars:
+      username: vagrant
+      #path to app
+      app_path   : /home/"{{ username }}"/
+      #path to service
+      service_path  : /etc/systemd/system/
+      #necessary packages to install
+      nes_env:
         - python3
         - python3-pip
+        - python3-dev
         - python-setuptools
-      state: latest
-      update_cache: yes
+        - libssl-dev
+        - libffi-dev
+        - ufw
 
-  - name: installing flask
-    pip:
-      executable: pip3
-      name: flask
-      state: latest
+      #app file
+      app_files:
+        - flask_app.py
+        - create_ssl
+      #service file
+      service_file: flask_app.service
 
-  - name: copy flask service
-    copy:
-      src: /$PWD/flaskapp.service
-      dest: /etc/systemd/system/flaskapp.service
+    tasks:
+      #get the target machine ip
+      #- set_fact: target_ip={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+      #- debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
 
-  - name: enable flask service
-    service: name=flaskapp.service enabled=yes
+      - name: Update the system and install necessary packages via loop
+        apt:
+          name          : "{{ nes_env }}"
+          force         : yes
+          update_cache  : yes
+          autoremove    : yes
+          autoclean     : yes
 
-  - name: start flaskapp service
-    service: name=flaskapp.service state=started
+      - name: Creating app dir
+        file:
+          path : "{{ app_path }}"
+          state: directory
+          mode : '0775'
+
+      - name: installing flask
+        pip:
+          executable: pip3
+          name: flask
+          state: latest
+      - name: pip3 command
+        command: pip3 install --upgrade pip
+
+      - name: installing rust
+        pip:
+          executable: pip3
+          name: rust
+          state: latest
+
+      - name: installing rust
+        pip:
+          executable: pip3
+          name: pyopenssl
+          state: latest
+
+      - name: installing emoji
+        pip:
+          executable: pip3
+          name: emoji
+          state: latest
+
+      - name: copy necessary files
+        copy:
+          src : "{{ app_files }}"
+          dest: "{{ app_path }}"
+          mode: '0775'
+
+      - name: create ssl
+        script: create_ssl "{{ username }}"
+
+      - name: copy systemd files
+        copy:
+          src : "{{ service_file }}"
+          dest: "{{ service_path }}"
+
+      #- name  : create ssl-keys
+      #  script: create_ssl
 
 
-  - name: Disable root login over ssh
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "^(#*)PermitRootLogin.*$"
-      line: "PermitRootLogin no"
-      state: present
-    notify: restart sshd
+      - name: rules for ufw
+        ufw:
+          rule: allow
+          name: '{{ item }}'
+        loop:
+          - "WWW Full"
+          - "OpenSSH"
+        notify:
+          - restart ufw
+
+      - name: copy sshd file
+        copy:
+         src  : sshd_config
+         dest : /etc/ssh/
+         force: yes
+
+      - name: ssh restart
+        command: systemctl restart sshd
+
+      - name: enable service
+        service:
+          name   : flask_app.service
+          enabled: yes
+
+      - name: start service
+        service:
+          name : flask_app.service
+          state: started
 
 
-  - name: Allow pubkey auth
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "^(#*)PubkeyAuthentication.*$"
-      line: "PubkeyAuthentication yes"
-      state: present
-    notify:
-      - restart sshd
-
-  - name: Disallow password auth
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "^(#*)PasswordAuthentication.*$"
-      line: "PasswordAuthentication no"
-      state: present
-    notify:
-      - restart sshd
-
-  - name: Disallow kerberos auth
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "^(#*)KerberosAuthentication.*$"
-      line: "KerberosAuthentication no"
-      state: present
-    notify:
-      - restart sshd
-
-  - name: Disallow challenge response auth
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "^(#*)ChallengeResponseAuthentication.*$"
-      line: "ChallengeResponseAuthentication no"
-      state: present
-    notify:
-      - restart sshd
-
-
-  handlers:
-    - name: restart sshd
-      service: name=sshd state=restarted
+    handlers:
+      - name: restart ufw
+        service: name=ufw state=restarted

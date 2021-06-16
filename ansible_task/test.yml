@@ -1,0 +1,7 @@
+---
+  - name       : test vars
+    hosts      : vmflask
+    #become     : yes
+
+    tasks:
+      - debug: var=hostvars[inventory_hostname]['ansible_user_id']

@@ -1,7 +1,8 @@
-[flask_servers]
-192.168.33.10
+[vmflask]
+flasktask ansible_host=192.168.33.10
 
-[flask_servers:vars]
-ansible_connection=ssh
+
+[vmflask:vars]
 ansible_user=vagrant
-ansible_ssh_pass=vagrant
+#ansible_sudo_pass='{{ vm_flaskapp_sudo_pass }}'
+ansible_ssh_private_key_file=~/.ssh/id_rsa
