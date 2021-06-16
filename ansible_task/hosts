@@ -5,4 +5,4 @@ flasktask ansible_host=192.168.33.10
 [vmflask:vars]
 ansible_user=vagrant
 #ansible_sudo_pass='{{ vm_flaskapp_sudo_pass }}'
-ansible_ssh_private_key_file=~/.ssh/id_rsa
+ansible_ssh_private_key_file=~/.ssh/andersen_id_rsa

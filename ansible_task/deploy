@@ -6,8 +6,8 @@ ip=$(cat hosts | grep ansible_host | awk -F'=' '{print $2}')
 #Getting ansible_user from Ansible hosts file
 user=$(cat hosts | grep ansible_user| awk -F'=' '{print $2}')
 
-ssh-keygen -q -t rsa -N '' -f ~/.ssh/id_rsa <<<y 2>&1 >/dev/null
+ssh-keygen -q -t rsa -N '' -f ~/.ssh/andersen_id_rsa <<<y 2>&1 >/dev/null
 
-ssh-copy-id -i  ~/.ssh/id_rsa.pub "$user"@"$ip"
+ssh-copy-id -i  ~/.ssh/andersen_id_rsa.pub "$user"@"$ip"
 
 ansible-playbook -i hosts playbook.yml -vvv
