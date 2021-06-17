@@ -27,3 +27,10 @@
  - SSL
 ## 12.06.2021
  - working with ss
+## 13.06.2021
+ - builtin vars ($? $# etc)
+## 15.06.2021
+ - git api
+ - ufw in ansible
+## 16.06.2021
+ - awk is cool
