@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Check if there no argument
+# check argument
 if [ -z "$1" ]; then
   echo "error: pls enter the address."
   exit 1
@@ -15,35 +15,52 @@ echo "Username and repo name:"
 echo "User = $user"
 echo "Repo = $repo"
 
-# Try to get json from git api
-query="https://api.github.com/repos/"$userrepo"/pulls?state=open"
 
-#stderr to abyss...
-query=$(curl $query 2> /dev/null)
-#check of curl passed or not (returning 0 means yes)
-lock=$?
-# Catch error
+declare -A pages
+pages[1]=$(curl https://api.github.com/repos/"$userrepo"/pulls?page=1\&state=open 2>/dev/null)
+lock=$? # check if curl passed or not (returning 0 means yes)
+
+#------Catch curl error------
 if [[ "$lock" -ne 0 ]]
 then
   echo "error: trouble in curl command."
   exit 1
 fi
+#------Cath curl error------
 
-# Parse the Curl output
-contributors=$(jq '.[].user.login' <<< $query)
-lock=$?
-# Catch error
+flag=true
+while [ "$flag" = true ]
+do
+  echo ${#pages[@]}
+  page=2
+  temp_curl=$(curl https://api.github.com/repos/"$userrepo"/pulls?page="$page"\&state=open 2>/dev/null)
+  if [[ $temp_curl == "null" || $temp_curl == "" ]]; then
+    flag=false
+  else
+    pages[$page]=$temp_curl
+    page=$[$page+1]
+    echo ${#pages[@]}
+  fi
+done
+
+
+
+# parse the curl output
+contributors=$(jq '.[].user.login' <<< $pages)
+lock=$? # check if jq passed or not
+
+#------Catch jq error------
 if [[ "$lock" -ne 0 ]]
 then
   echo "error: trouble in jq command."
   exit 1
 fi
+#------Catch jq error------
+
 
 if [[ $contributors == "null" || $contributors == "" ]]; then
   echo "Open pull requests is absent"
   exit 1
-else
-  echo "Open pull requests is present"
 fi
 echo""
 
@@ -62,11 +79,31 @@ echo "Contributors with more than one pull request:"
 for contributor in "$u_contributors"
 do
   #if <count> more than 1 then get this dude
-  Liders=$(awk "{if ( \$1>1 ) {print \$1,\$2}}" <<< "$contributor")
+  rabotyagi=$(awk "{if ( \$1>1 ) {print \$1,\$2}}" <<< "$contributor")
 done
 
 echo ""
-#remove "" from names
-Liders="${Liders//'"'}"
-echo "$Liders"
+rabotyagi="${rabotyagi//'"'}" # remove "" from names
+echo "$rabotyagi"
 echo ""
+
+
+
+
+
+tags=$(jq '.[].labels[0].name' <<< $query 2> /dev/null) # get labels
+lock=$?
+
+#------Catch jq error------
+if [[ "$lock" -ne 0 ]]
+then
+  echo "Script aborted! Error in jq command with Names."
+  exit 1
+fi
+#------Cath jq error------
+
+SAVEIFS=$IFS
+IFS=$'\n'
+
+cnt_arr=($contributors)
+lbl_arr=($tags)
