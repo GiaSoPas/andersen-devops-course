@@ -4,6 +4,7 @@
 # Task table
 Course duration: 31.05 - 21.07
 
+
 | Task  | Deadline |Status|
 | ------------- | ------------- |---------|
 | [TIL-blog](https://github.com/nastasyafedotovna/andersen-devops-course/tree/main/TIL)  | 07.06 21:00  | done |
@@ -13,3 +14,11 @@ Course duration: 31.05 - 21.07
 | [telegram bot on go](https://github.com/nastasyafedotovna/andersen-devops-course/tree/main/go_gitbot)  | 30.06 21:00|in progress|
 | [git api task](https://github.com/nastasyafedotovna/andersen-devops-course/tree/main/git_api)  | 21.06 21:00|beta version|
 | [docker task](https://github.com/nastasyafedotovna/andersen-devops-course/tree/main/docker_task)  | 28.06 21:00|in progress|
+<br />
+#Status values:
+|Value|Description|
+|-----|-----------|
+|in progress|less than 50% complete work|
+|beta version|more than 50% complete work|
+|on tests|version is being tested|
+|done|work is done|
