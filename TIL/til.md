@@ -34,3 +34,7 @@
  - ufw in ansible
 ## 16.06.2021
  - awk is cool
+## 17.06.2021
+ - git api
+## 18.06.2021
+ - some parameters in url
