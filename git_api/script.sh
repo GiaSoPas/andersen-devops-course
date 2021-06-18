@@ -36,13 +36,13 @@ fi
 contributors=$(jq '.[].user.login' <<< $query)
 lock=$? # check if jq passed or not
 
-#------Catch jq error------
+#------\/Cath jq error\/------
 if [[ "$lock" -ne 0 ]]
 then
   echo "error: trouble in jq command."
   exit 1
 fi
-#------Catch jq error------
+#------/\Catch jq error/\------
 
 
 if [[ $contributors == "null" || $contributors == "" ]]; then
