@@ -38,6 +38,6 @@
  - git api
 ## 18.06.2021
  - some parameters in url
-## 18.06.2021
+## 19.06.2021
  - sed utility
  - how open PR
