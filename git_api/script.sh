@@ -14,39 +14,26 @@ repo=$(echo $userrepo | awk -F'/' '{print $2}') # "$repo"
 echo "Username and repo name:"
 echo "User = $user"
 echo "Repo = $repo"
+echo ""
+echo "Checking PR in progress..."
+echo ""
 
+query="https://api.github.com/repos/"$userrepo"/pulls?per_page=1000\&state=open"
 
-declare -A pages
-pages[1]=$(curl https://api.github.com/repos/"$userrepo"/pulls?page=1\&state=open 2>/dev/null)
+query=$(curl $query 2>/dev/null)
 lock=$? # check if curl passed or not (returning 0 means yes)
 
-#------Catch curl error------
+#------\/Catch curl error\/------
 if [[ "$lock" -ne 0 ]]
 then
   echo "error: trouble in curl command."
   exit 1
 fi
-#------Cath curl error------
-
-flag=true
-while [ "$flag" = true ]
-do
-  echo ${#pages[@]}
-  page=2
-  temp_curl=$(curl https://api.github.com/repos/"$userrepo"/pulls?page="$page"\&state=open 2>/dev/null)
-  if [[ $temp_curl == "null" || $temp_curl == "" ]]; then
-    flag=false
-  else
-    pages[$page]=$temp_curl
-    page=$[$page+1]
-    echo ${#pages[@]}
-  fi
-done
-
+#------/\Cath curl error/\------
 
 
 # parse the curl output
-contributors=$(jq '.[].user.login' <<< $pages)
+contributors=$(jq '.[].user.login' <<< $query)
 lock=$? # check if jq passed or not
 
 #------Catch jq error------
@@ -60,9 +47,11 @@ fi
 
 if [[ $contributors == "null" || $contributors == "" ]]; then
   echo "Open pull requests is absent"
-  exit 1
+else
+  echo "Open pull requests is present"
 fi
-echo""
+echo "Checking PR is done"
+echo ""
 
 
 # Counting pull requests for the contributors
