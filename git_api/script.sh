@@ -18,9 +18,9 @@ echo ""
 echo "Checking PR in progress..."
 echo ""
 
-query="https://api.github.com/repos/"$userrepo"/pulls?per_page=1000\&state=open"
+query="https://api.github.com/repos/"$userrepo"/pulls?per_page=1000&state=open"
 
-query=$(curl $query 2>/dev/null)
+query=$(curl $query 2> /dev/null)
 lock=$? # check if curl passed or not (returning 0 means yes)
 
 #------\/Catch curl error\/------
