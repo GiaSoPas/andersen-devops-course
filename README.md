@@ -1,7 +1,7 @@
-# What is this repository about?
+## What is this repository about?
 *This repository is dedicated to Andersen's DevOps course.*
 
-# Task table
+## Task table
 Course duration: 31.05 - 21.07
 
 
@@ -15,7 +15,7 @@ Course duration: 31.05 - 21.07
 | [git api task](https://github.com/nastasyafedotovna/andersen-devops-course/tree/main/git_api)  | 21.06 21:00|beta version|
 | [docker task](https://github.com/nastasyafedotovna/andersen-devops-course/tree/main/docker_task)  | 28.06 21:00|in progress|
 
-# Status values
+## Status values
 
 | Value | Description |
 | -------------- | ----------- |
