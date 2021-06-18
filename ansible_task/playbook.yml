@@ -83,8 +83,8 @@
       #    dest: "{{ app_path }}"
       #    mode: '0775'
 
-      - name: create ssl
-        script: create_ssl "{{ username }}"
+      #- name: create ssl
+      #  script: create_ssl "{{ username }}"
 
       - name: copy systemd files
         copy:
@@ -97,17 +97,18 @@
       - name: enable ufw
         ufw:
           state: enabled
+          policy: allow
 
 
-      - name: 15a-Copy file rule for flask
-        copy:
-          src: "{{ rule_file }}"
-          dest: /etc/ufw/applications.d
-          owner: root
-          group: root
-          mode: '0644'
-        notify:
-          - restart ufw
+    #  - name: 15a-Copy file rule for flask
+    #    copy:
+    #      src: "{{ rule_file }}"
+    #      dest: /etc/ufw/applications.d
+    #      owner: root
+    #      group: root
+    #      mode: '0644'
+    #    notify:
+    #      - restart ufw
 
       - name: rules for ufw
         ufw:
@@ -115,8 +116,7 @@
           name: '{{ item }}'
         loop:
           - "WWW Full"
-          - "OpenSSH"
-          - "flask_app"
+          - "ssh"
         notify:
           - restart ufw
 
@@ -128,8 +128,11 @@
          dest : /etc/ssh/
          force: yes
 
-      - name: ssh restart
-        command: systemctl restart sshd
+
+      - name: restart sshd
+        service:
+          name: sshd
+          state: restarted
 
       - name: enable service
         service:
@@ -145,3 +148,6 @@
     handlers:
       - name: restart ufw
         service: name=ufw state=restarted
+
+      #- name: restart sshd
+      #  service: name=sshd state=restarted
