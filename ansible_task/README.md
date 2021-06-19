@@ -44,3 +44,46 @@ Made with ❤️ by %your_name
 ### Requirements
 * Debian 10
 * VirtualBox VM
+
+
+
+### Presetting the system
+
+#### install sudo
+Go to the superuser with the command:  
+```sh
+su
+```
+enter root password then install ```sudo```:
+```sh
+apt install sudo
+```
+
+#### add user to sudo group:
+Under the superuser, enter the command:
+```sh
+/usr/sbin/usermod -aG sudo <here the target machine user>
+```
+example:
+```sh
+/usr/sbin/usermod -aG sudo gizar
+```
+For the changes to take effect, you need to logout.
+
+
+### create secret file with sudo pass
+```sh
+ansible-vault create secret.yml
+```
+enter vault passsword, then add this line to file:
+```
+ansible_sudo_pass: <sudo pass of target machine user>
+```
+
+#### in hosts file
+configure the hosts file:
+```sh
+flasktask ansible_host=<here the target machine ip>
+....
+ansible_user=<here the target machine user>
+```

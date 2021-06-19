@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/vagrant/
-ExecStart=/usr/bin/python3 /home/vagrant/flask_app.py
+WorkingDirectory=/home/andersen/
+ExecStart=/usr/bin/python3 /home/andersen/flask_app.py
 
 [Install]
 WantedBy=multi-user.target

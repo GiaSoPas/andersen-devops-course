@@ -1,4 +1,0 @@
-[flask_app]
-title=ansible task by gizar zigangirov
-description=My app flask emoji
-ports=80,8080,443/tcp

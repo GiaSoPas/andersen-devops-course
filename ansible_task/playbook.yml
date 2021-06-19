@@ -1,36 +1,28 @@
 ---
-  - name       : Deploy flask app to vm
-    hosts      : vmflask
-    become     : yes
-
+  - name         : Deploy flask app to vm
+    hosts        : vmflask
+    become       : yes
     vars:
-      username: vagrant
-      rule_file: rule_flaskapp
+      username: andersen
       #path to app
-      app_path   : /home/vagrant/
+      app_path   : /home/andersen/
+
       #path to service
       service_path  : /etc/systemd/system/
+
       #necessary packages to install
       nes_env:
         - python3
         - python3-pip
-        - python3-dev
         - python-setuptools
-        - libssl-dev
-        - libffi-dev
         - ufw
 
       #app file
       app_file: flask_app.py
-      #myscript: create_ssl
       #service file
       service_file: flask_app.service
 
     tasks:
-      #get the target machine ip
-      #- set_fact: target_ip={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
-      #- debug: var=hostvars[inventory_hostname]['ansible_default_ipv4']['address']
-
       - name: Update the system and install necessary packages via loop
         apt:
           name          : "{{ nes_env }}"
@@ -45,25 +37,21 @@
           state: directory
           mode : '0775'
 
+
+      - name: copy systemd files
+        copy:
+          src : "{{ service_file }}"
+          dest: "{{ service_path }}"
+
+
       - name: installing flask
         pip:
           executable: pip3
           name: flask
           state: latest
+
       - name: pip3 command
         command: pip3 install --upgrade pip
-
-      - name: installing rust
-        pip:
-          executable: pip3
-          name: rust
-          state: latest
-
-      - name: installing rust
-        pip:
-          executable: pip3
-          name: pyopenssl
-          state: latest
 
       - name: installing emoji
         pip:
@@ -77,38 +65,11 @@
           dest: "{{ app_path }}"
           mode: '0775'
 
-      #- name: copy necessary files
-      #  copy:
-      #    src : "{{ myscript }}"
-      #    dest: "{{ app_path }}"
-      #    mode: '0775'
-
-      #- name: create ssl
-      #  script: create_ssl "{{ username }}"
-
-      - name: copy systemd files
-        copy:
-          src : "{{ service_file }}"
-          dest: "{{ service_path }}"
-
-      #- name  : create ssl-keys
-      #  script: create_ssl
-
       - name: enable ufw
         ufw:
           state: enabled
           policy: allow
 
-
-    #  - name: 15a-Copy file rule for flask
-    #    copy:
-    #      src: "{{ rule_file }}"
-    #      dest: /etc/ufw/applications.d
-    #      owner: root
-    #      group: root
-    #      mode: '0644'
-    #    notify:
-    #      - restart ufw
 
       - name: rules for ufw
         ufw:
@@ -119,8 +80,6 @@
           - "ssh"
         notify:
           - restart ufw
-
-
 
       - name: copy sshd file
         copy:
@@ -144,10 +103,6 @@
           name : flask_app.service
           state: started
 
-
     handlers:
       - name: restart ufw
         service: name=ufw state=restarted
-
-      #- name: restart sshd
-      #  service: name=sshd state=restarted
