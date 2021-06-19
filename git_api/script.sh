@@ -19,7 +19,7 @@ echo -ne "[+]Checking PR is started\r"
 echo ""
 echo -ne "[|]Checking PR....(10%) \r"
 
-query="https://api.github.com/repos/"$userrepo"/pulls?per_page=1000&state=open"
+query="https://api.github.com/repos/"$userrepo"/pulls?per_page=1000"
 echo -ne "[/]Checking PR...(20%) \r"
 
 
