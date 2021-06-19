@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 # Get the user and repo
-userrepo=$(echo $1 | awk -F'com/' '{print $2}') # "$user/$repo"
+userrepo=$(echo $1 | awk -F'.com/' '{print $2}') # "$user/$repo"
 user=$(echo $userrepo | awk -F'/' '{print $1}') # "$user"
 repo=$(echo $userrepo | awk -F'/' '{print $2}') # "$repo"
 
