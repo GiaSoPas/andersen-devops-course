@@ -4,4 +4,3 @@ flasktask ansible_host=192.168.1.137
 
 [vmflask:vars]
 ansible_user=andersen
-ansible_ssh_private_key_file=~/.ssh/andersen_id_rsa
