@@ -1,5 +1,5 @@
 [vmflask]
-flasktask ansible_host=192.168.1.137
+flasktask ansible_host=192.168.1.132
 
 
 [vmflask:vars]

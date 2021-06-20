@@ -3,7 +3,6 @@
     hosts        : vmflask
     become       : yes
     vars:
-      username: andersen
       #path to app
       app_path   : /home/andersen/
 
@@ -70,6 +69,7 @@
       - name   : rules for ufw
         command: "ufw {{ item }}"
         with_items: ["default deny incoming", "default allow outgoing", "allow ssh", "allow 80", "allow 443"]
+        notify: restart ufw
 
       - name: copy sshd file
         copy:
