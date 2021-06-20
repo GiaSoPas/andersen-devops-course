@@ -87,3 +87,25 @@ flasktask ansible_host=<here the target machine ip>
 ....
 ansible_user=<here the target machine user>
 ```
+### Deploy
+
+ 1. the 'deploy' script will generate the ssh keys and send them to the target machine 
+  2. updating the target system and install python3, python3-pip, python-setuptools, ufw
+  3. creating dir for flask application
+  4. copy service file
+  5. installing flask
+  6. installing emoji
+  7. copy flask_app.py
+  8. enable ufw
+  9. creating rules 
+  10. copy sshd config
+  11. restarting sshd service
+  12. enable our service
+  13. starting our service
+
+for deploy just:
+```sh
+./deploy
+```
+
+
