@@ -50,9 +50,6 @@
           name: flask
           state: latest
 
-      - name: pip3 command
-        command: pip3 install --upgrade pip
-
       - name: installing emoji
         pip:
           executable: pip3
@@ -68,18 +65,11 @@
       - name: enable ufw
         ufw:
           state: enabled
-          policy: allow
 
 
-      - name: rules for ufw
-        ufw:
-          rule: allow
-          name: '{{ item }}'
-        loop:
-          - "WWW Full"
-          - "ssh"
-        notify:
-          - restart ufw
+      - name   : rules for ufw
+        command: "ufw {{ item }}"
+        with_items: ["default deny incoming", "default allow outgoing", "allow ssh", "allow 80", "allow 443"]
 
       - name: copy sshd file
         copy:
