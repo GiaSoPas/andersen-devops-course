@@ -41,3 +41,7 @@
 ## 19.06.2021
  - sed utility
  - how open PR
+ - installing sudo
+## 20.06.2021
+ - "with-items" in ansible needs list format 
+ - ensurepip module
