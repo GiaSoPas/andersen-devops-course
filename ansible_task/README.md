@@ -47,7 +47,7 @@ Made with ❤️ by %your_name
 
 
 
-### Presetting the system
+### Presetting the target system
 
 #### install sudo
 Go to the superuser with the command:  
