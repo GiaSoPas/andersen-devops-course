@@ -71,14 +71,26 @@ example:
 For the changes to take effect, you need to logout.
 
 
-### create secret file with sudo pass
+### vault
 ```sh
 ansible-vault create secret.yml
 ```
-enter vault passsword, then add this line to file:
+enter your vault passsword, then add this lines to file:
 ```
 ansible_sudo_pass: <sudo pass of target machine user>
+ansible_ssh_private_key_file: ~/.ssh/andersen_id_rsa
 ```
+###### or if you use my secret.yml
+
+my vault password: vault
+
+```sh
+ansible-vault edit secret.yml
+```
+enter my vault passsword, then edit this line:
+```ansible_sudo_pass: andersen``` to ```ansible_sudo_pass: <sudo pass of target machine user>```
+
+
 
 #### in hosts file
 configure the hosts file:
