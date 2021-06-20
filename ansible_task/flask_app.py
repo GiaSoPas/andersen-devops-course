@@ -77,10 +77,10 @@ def main():
 
             if type(count) == type(5):
                 out = '{} says {}\n'.format(animal, sound)*count + \
-                emoji.emojize('Made with :heart: by Gizar Zigangirov\n')
+                emoji.emojize('Made with :heart: by Gizar Zigangirov\n', use_aliases=True)
             else:
                 out = '{} says {}\n'.format(animal, sound) + \
-                emoji.emojize('Made with :heart: by Gizar Zigangirov\n')
+                emoji.emojize('Made with :heart: by Gizar Zigangirov\n', use_aliases=True)
 
         else:
 
