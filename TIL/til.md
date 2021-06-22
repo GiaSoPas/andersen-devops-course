@@ -45,3 +45,9 @@
 ## 20.06.2021
  - "with-items" in ansible needs list format 
  - ensurepip module
+## 21.06.2021
+ - creating instances in ec2
+ - editing security group
+## 22.06.2021
+ - installing ssh utility in powershell
+ - chmod 400 by powershell
